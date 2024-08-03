@@ -51,3 +51,76 @@ for event in pygame.event.get():
 - Circle: `pygame.draw.circle(screen, color, center, radius, width=0)`
 
 - Polygon: `pygame.draw.polygon(screen, color, pointlist, width=0)`, where pointlist is list of points (tuples)
+
+## Snake Game
+
+- First let us start with the game state. 
+
+    - Description of snake: The entire length of snake, its tail and head, direction of motion (after the event)
+
+    - Description of food: loc of food ~ Probability distribution(grid - snake occupied). This is also after event, so if snake head coincide with food, the length increase and a new food location is given.
+
+    - Score: number of food eaten.
+
+- Update game state. Returns is_over, new game state.
+
+    - is_over: If the snakes goes out of bound or touches itself or no more space to go game is over.
+
+    - new game state: The position of entire snake is updated based on direction. If the snake lands on food, the length is increased (say the tail increase).
+
+Technically we are writing -
+
+```py
+
+class Snake:
+    def __init__(self, len=3, pointlist=(...)):
+        self.pointlist = pointlist # starting with head and ending with tail
+        self.length = len(pointlist)
+        self.direction = (...) # (1,0), (-1,0), (0,1), (0,-1)
+    def valid_snake(self):
+        # check if pointlist makes sense
+        # check if direction is our of four only
+        # Also check collision with itself
+        pass
+    def move_snake(self):
+        # move the snake in direction one step. 
+        # update pointlist
+        pass
+    def inc_length(self):
+        # called when snake ate food and want to increase length
+        pass
+
+class Food:
+    def __init__(self, location=(...), point=1):
+        self.location = (...)
+        self.point = point
+    def new_location(self, snake_pointlist):
+        self.location = ~Probability(grid - snake_pointlist)
+
+
+class GameState:
+    def __init__(self, def_snake=Snake(), def_food=Food()):
+        self.snake = def_snake
+        self.food = def_food
+        self.score = 0
+    def update_gamestate(self):
+        # The user can only update the direction of snake 
+        # returns is_over (bool)
+        # 1. Move the snake
+        # 2. Check if snake is colliding with itself or the wall
+        # 3. Check if snake head is on food. If yes increase length of snake and update food
+        pass
+    def render_gamestate(self):
+        pass
+```
+
+- Now the snake also has some size (not just a pixel). Instead of using standard pygame co-ordinates, we transform the gridspace into a bigger grid space and above classes are coordinates in that grid space. So (x,y) in new grid space translates to (x*blockSize, y*blocksize) in orignial space (the co-ordinate of top left of the rect. But can treat as that of grid too!)
+
+```py
+def drawGrid():
+    blockSize = 20 #Set the size of the grid block
+    for x in range(0, WINDOW_WIDTH, blockSize):
+        for y in range(0, WINDOW_HEIGHT, blockSize):
+            rect = pygame.Rect(x, y, blockSize, blockSize)
+            pygame.draw.rect(SCREEN, WHITE, rect, 1)
+```
